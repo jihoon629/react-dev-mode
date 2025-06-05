@@ -24,10 +24,46 @@ export const loginUser = createAsyncThunk(
         })
       );
 
-      return  { username: userNameFromServer, userId, realName };
+      return { username: userNameFromServer, userId, realName };
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "로그인에 실패했습니다.";
+      error.response?.data?.message || "로그인에 실패했습니다.";
+
+      dispatch(
+        showToastMessage({
+          message: errorMessage,
+          status: "error",
+          status: "error",
+        })
+      );
+
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// 회원가입
+export const registerUser = createAsyncThunk(
+  "user/registerUser",
+  "user/registerUser",
+  async (userData, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await willService.registerUser(userData);
+
+      dispatch(
+        showToastMessage({
+          message: "회원가입이 완료되었습니다. 로그인해주세요!",
+          status: "success",
+          message: "회원가입이 완료되었습니다. 로그인해주세요!",
+          status: "success",
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "회원가입에 실패했습니다.";
 
       dispatch(
         showToastMessage({
@@ -41,24 +77,25 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// 회원가입
-export const registerUser = createAsyncThunk(
-  "user/registerUser",
-  async (userData, { dispatch, rejectWithValue }) => {
+// 공증인 회원가입
+export const registerNotary = createAsyncThunk(
+  "user/registerNotary",
+  async ({ values, navigate }, { dispatch, rejectWithValue }) => {
     try {
-      const response = await willService.registerUser(userData);
+      const response = await willService.registerNotary(values);
 
       dispatch(
         showToastMessage({
-          message: "회원가입이 완료되었습니다. 로그인해주세요!",
+          message: "공증인 회원가입이 완료되었습니다. 로그인해주세요!",
           status: "success",
         })
       );
 
+      navigate("/login");
       return response.data;
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "회원가입에 실패했습니다.";
+        error.response?.data?.message || "공증인 회원가입에 실패했습니다.";
 
       dispatch(
         showToastMessage({
@@ -138,15 +175,30 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
+      // 공증인 회원가입
+      .addCase(registerNotary.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(registerNotary.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(registerNotary.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       // 로그아웃
       .addCase(logoutUser.fulfilled, (state) => {
         state.username = null;
         state.userId = null;
         state.realName = null;
-        sessionStorage.removeItem('realName');
+        sessionStorage.removeItem("realName");
       });
   },
 });
 
 export const { clearUserError } = userSlice.actions;
+// 개별 export는 이미 위에서 했으므로 중복 제거
+// export { loginUser, logoutUser, registerUser, registerNotary }; 삭제
 export default userSlice.reducer;
