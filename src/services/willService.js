@@ -1,7 +1,7 @@
 import axios from "axios"; //백엔드 API 호출 모듈 (axios)
 
 // 이 baseURL 설정은 유지합니다. 각 API 호출은 이 URL 뒤에 붙는 상대 경로를 사용합니다.
-axios.defaults.baseURL = "http://192.168.72.129:8001";
+axios.defaults.baseURL = "http://localhost:8001";
 
 /**
  * 텍스트 기반 유언장을 등록합니다.
@@ -177,9 +177,29 @@ const getWillImageByImageRecordId = (imageRecordId) => {
  * 사용자 프로필 조회 (GET /mypage/profile)
  */
 const getUserProfile = async (username) => {
-  if (!username) throw new Error("Username is required.");
-  const response = await axios.get("/mypage/profile", { params: { username } });
-  return response.data;
+  if (!username) {
+    throw new Error("Username is required to fetch user profile.");
+  }
+  try {
+    const response = await axios.get(`/kkk/${username}`); // URL 변경: 경로 파라미터 사용
+    return response.data;
+  } catch (error) {
+    console.error(
+      `willService.getUserProfile: Failed for user ${username}`,
+      error.response?.data || error.message
+    );
+    if (error.response) {
+      const serviceError = new Error(
+        error.response.data.message ||
+          error.response.data.error ||
+          "Failed to get user profile"
+      );
+      serviceError.status = error.response.status;
+      serviceError.data = error.response.data;
+      throw serviceError;
+    }
+    throw error;
+  }
 };
 
 /**
@@ -219,6 +239,37 @@ const updateUserProfileExtended = async ({
     role,
   });
 };
+const getWillStatusCounts = async (username) => {
+  if (!username) {
+    throw new Error("Username is required to fetch will status counts.");
+  }
+  try {
+    const response = await axios.get(`/mypage/status-counts/${username}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `willService.getWillStatusCounts: Failed for user ${username}`,
+      error.response?.data || error.message
+    );
+    if (error.response) {
+      const serviceError = new Error(
+        error.response.data.message ||
+          error.response.data.error ||
+          "Failed to get will status counts"
+      );
+      serviceError.status = error.response.status;
+      serviceError.data = error.response.data;
+      throw serviceError;
+    }
+    throw error;
+  }
+};
+
+
+
+
+
+
 
 // 정의된 모든 함수들을 export 합니다.
 export default {
@@ -236,4 +287,5 @@ export default {
   updatePassword,
   updateUserProfile,
   updateUserProfileExtended,
+  getWillStatusCounts
 };
