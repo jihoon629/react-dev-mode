@@ -139,6 +139,7 @@ const loginUser = (credentials) => axios.post("/auth/login", credentials);
  * 백엔드 엔드포인트: POST /auth/register (routes.js 기준)
  */
 const registerUser = (userData) => axios.post("/auth/register", userData);
+const registerNotary = (notaryData) => axios.post("/auth/register", notaryData); // 이 함수를 추가하세요.
 
 /**
  * 사용자 이름(username)으로 실제 이름(realName)을 조회합니다.
@@ -373,7 +374,7 @@ const updateWillStatusAdmin = async (willId, newStatus) => {
   }
 };
 // 정의된 모든 함수들을 export 합니다.
-export default {
+export default {registerNotary,
   registerWill,
   getWillDetails, // getWillDetailsService 대신 getWillDetails를 export (또는 반대로 통일)
   getMyWills,
