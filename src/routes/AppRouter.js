@@ -18,7 +18,7 @@ import WillDetails from "../pages/WillDetailPage";
 import UserProfileComponent from "../components/UserProfileComponent";
 import UserMyPage from "../pages/MyPage/MyPage";
 import NotaryServicePage from "../pages/NotaryServicePage/NotaryServicePage";
-
+import AdminManagement from "../pages/AdminManagement/AdminManagement"
 const AppRouter = () => {
   return (
     <Routes>
@@ -42,6 +42,10 @@ const AppRouter = () => {
         <Route path="/name" element={<UserProfileComponent />} />
         <Route path="/MyPage" element={<UserMyPage />} />
         <Route path="/notary-service" element={<NotaryServicePage />} />
+
+        
+        <Route path="/admin" element={<AdminManagement />} />
+
       </Route>
 
       {/* Catch-All Not Found Page */}
