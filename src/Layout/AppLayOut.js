@@ -249,7 +249,7 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { username } = useSelector((state) => state.user);
+  const { realName, username } = useSelector((state) => state.user);
   const isLoggedIn = !!username;
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -299,7 +299,7 @@ const AppLayout = () => {
             <UserTab>
               <UserProfile onClick={() => setDropdownOpen((prev) => !prev)}>
                 <AccountCircleIcon style={{ color: "#6366f1" }} />
-                <UserName>{username || "사용자"}</UserName>
+                <UserName>{realName || username || "사용자"}</UserName>
                 {dropdownOpen ? (
                   <KeyboardArrowUpIcon />
                 ) : (
@@ -352,7 +352,7 @@ const AppLayout = () => {
             <h5>서비스</h5>
             <div onClick={() => navigate("/write")}>유언장 작성</div>
             <div>공증 서비스</div>
-            <div onClick={() => navigate("/Detail")}>유언장 관리</div>
+            <div onClick={() => navigate("/success")}>유언장 관리</div>
             <div>보안 정책</div>
           </FooterColumn>
 

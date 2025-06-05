@@ -1,70 +1,121 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import willService from '../../services/willService';
-import { showToastMessage } from '../common/uiSlice';
+// ✅ willSlice.js - 기존 슬라이스 코드 리팩토링 (WillList 기반)
 
-// ✅ 유언장 목록 가져오기
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import willService from "../../services/willService";
+import { showToastMessage } from "../common/uiSlice";
+
+// ✅ 유언장 목록 가져오기 (내가 작성한 유언장)
 export const fetchMyWills = createAsyncThunk(
-  'will/fetchMyWills',
-  async (username, { rejectWithValue }) => {
+  "will/fetchMyWills",
+  async (username, { dispatch, rejectWithValue }) => {
     try {
       const data = await willService.getMyWills(username);
+      if (Array.isArray(data)) {
+        dispatch(
+          showToastMessage({
+            message: `${data.length}개의 유언장이 조회되었습니다.`,
+            status: "success",
+          })
+        );
+      } else {
+        dispatch(
+          showToastMessage({
+            message: "유언장 정보 응답 형식이 올바르지 않습니다.",
+            status: "error",
+          })
+        );
+      }
       return data;
     } catch (error) {
-      return rejectWithValue(error.message || '유언장 목록 조회 실패');
+      dispatch(
+        showToastMessage({
+          message: "나의 유언장 조회 실패: " + (error.message || "오류 발생"),
+          status: "error",
+        })
+      );
+      return rejectWithValue(error.message || "유언장 목록 조회 실패");
     }
   }
 );
 
 // ✅ 유언장 상세 정보 가져오기
 export const fetchWillDetails = createAsyncThunk(
-  'will/fetchWillDetails',
+  "will/fetchWillDetails",
   async ({ willId, username }, { rejectWithValue }) => {
     try {
       const data = await willService.getWillDetails(willId, username);
       return data;
     } catch (error) {
-      return rejectWithValue(error.message || '유언장 상세 조회 실패');
+      return rejectWithValue(error.message || "유언장 상세 조회 실패");
     }
   }
 );
 
 // ✅ 유언장 등록
 export const registerWill = createAsyncThunk(
-  'will/registerWill',
+  "will/registerWill",
   async (formData, { dispatch, rejectWithValue }) => {
     try {
       await willService.registerWillWithImage(formData);
-      dispatch(showToastMessage({ message: '유언장이 성공적으로 등록되었습니다.', status: 'success' }));
+      dispatch(
+        showToastMessage({
+          message: "유언장이 성공적으로 등록되었습니다.",
+          status: "success",
+        })
+      );
       return true;
     } catch (error) {
-      dispatch(showToastMessage({ message: '유언장 등록 실패', status: 'error' }));
-      return rejectWithValue(error.message || '유언장 등록 실패');
+      dispatch(
+        showToastMessage({ message: "유언장 등록 실패", status: "error" })
+      );
+      return rejectWithValue(error.message || "유언장 등록 실패");
     }
   }
 );
 
 // ✅ OCR 텍스트 추출
 export const extractTextFromImage = createAsyncThunk(
-  'will/extractTextFromImage',
+  "will/extractTextFromImage",
   async (file, { rejectWithValue }) => {
     try {
       const response = await willService.extractTextFromImage(file);
       return response.data.text;
     } catch (error) {
-      return rejectWithValue(error.message || '텍스트 추출 실패');
+      return rejectWithValue(error.message || "텍스트 추출 실패");
     }
   }
 );
 
 // ✅ 지정된 유언장 목록 (열람권한 있는 유언장)
 export const fetchDesignatedWills = createAsyncThunk(
-  'will/fetchDesignatedWills',
-  async (username, { rejectWithValue }) => {
+  "will/fetchDesignatedWills",
+  async (username, { dispatch, rejectWithValue }) => {
     try {
       const data = await willService.getDesignatedViewersWills(username);
+      if (Array.isArray(data)) {
+        dispatch(
+          showToastMessage({
+            message: `${data.length}개의 지정 유언장이 조회되었습니다.`,
+            status: "success",
+          })
+        );
+      } else {
+        dispatch(
+          showToastMessage({
+            message: "지정 유언장 응답 형식이 올바르지 않습니다.",
+            status: "error",
+          })
+        );
+      }
       return data;
     } catch (error) {
-      return rejectWithValue(error.message || '지정 유언장 조회 실패');
+      dispatch(
+        showToastMessage({
+          message: "지정 유언장 조회 실패: " + (error.message || "오류 발생"),
+          status: "error",
+        })
+      );
+      return rejectWithValue(error.message || "지정 유언장 조회 실패");
     }
   }
 );
@@ -74,14 +125,14 @@ const initialState = {
   myWills: [],
   designatedWills: [],
   selectedWill: null,
-  extractedText: '',
+  extractedText: "",
   loading: false,
   error: null,
 };
 
 // ✅ 슬라이스 정의
 const willSlice = createSlice({
-  name: 'will',
+  name: "will",
   initialState,
   reducers: {
     clearSelectedWill: (state) => {
@@ -93,7 +144,6 @@ const willSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // 🔹 내 유언장 목록
       .addCase(fetchMyWills.pending, (state) => {
         state.loading = true;
       })
@@ -105,8 +155,6 @@ const willSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔹 상세 정보
       .addCase(fetchWillDetails.pending, (state) => {
         state.loading = true;
       })
@@ -118,8 +166,6 @@ const willSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔹 유언장 등록
       .addCase(registerWill.pending, (state) => {
         state.loading = true;
       })
@@ -130,8 +176,6 @@ const willSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔹 OCR
       .addCase(extractTextFromImage.pending, (state) => {
         state.loading = true;
       })
@@ -143,8 +187,6 @@ const willSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔹 지정 유언장 목록
       .addCase(fetchDesignatedWills.pending, (state) => {
         state.loading = true;
       })
@@ -159,6 +201,5 @@ const willSlice = createSlice({
   },
 });
 
-// ✅ 액션 및 리듀서 export
 export const { clearSelectedWill, clearWillError } = willSlice.actions;
 export default willSlice.reducer;

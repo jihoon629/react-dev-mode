@@ -1,22 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
-  PageWrapper, Content, Title, Subtitle,
-  SectionWrapper, SectionHeader, SectionContent,
-  Row, Label, Input, Select, Button, SubmitButton,
-  AddressRow, PhoneRow, MobileRow
-} from './style/RegisterPageStyle';
+  PageWrapper,
+  Content,
+  Title,
+  Subtitle,
+  SectionWrapper,
+  SectionHeader,
+  SectionContent,
+  Row,
+  Label,
+  Input,
+  Select,
+  Button,
+  SubmitButton,
+  AddressRow,
+  PhoneRow,
+  MobileRow,
+} from "./style/RegisterPageStyle";
+import { registerUser } from "../../features/user/userSlice";
 
 const RegisterPage = () => {
-  const [memberType, setMemberType] = useState('personal');
-  const [gender, setGender] = useState('male');
+  const dispatch = useDispatch();
+  const [memberType, setMemberType] = useState("personal");
+  const [gender, setGender] = useState("male");
+
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    passwordConfirm: "",
+    name: "",
+    email: "",
+    phone: "",
+    birth: "",
+    address: "",
+    gender: "male",
+    role: "user",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (form.password !== form.passwordConfirm) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+    dispatch(registerUser(form));
+  };
 
   return (
     <PageWrapper>
-      <Content>
+      <Content as="form" onSubmit={handleSubmit}>
         <Title>가입을 시작합니다.</Title>
         <Subtitle>마침표에 오신것을 환영합니다.</Subtitle>
 
-        {/* 회원인증 */}
         <SectionWrapper>
           <SectionHeader>
             <span>회원인증</span>
@@ -29,91 +70,143 @@ const RegisterPage = () => {
                   type="radio"
                   name="memberType"
                   value="personal"
-                  checked={memberType === 'personal'}
-                  onChange={() => setMemberType('personal')}
-                /> 개인회원
+                  checked={memberType === "personal"}
+                  onChange={() => setMemberType("personal")}
+                />{" "}
+                개인회원
               </label>
             </Row>
           </SectionContent>
         </SectionWrapper>
 
-        {/* 기본정보 */}
         <SectionWrapper>
           <SectionHeader>
             <span>기본정보</span>
-            <span style={{ color: '#e74c3c', fontSize: '12px' }}>필수</span>
+            <span style={{ color: "#e74c3c", fontSize: "12px" }}>필수</span>
           </SectionHeader>
           <SectionContent>
-            {[
-              { label: '아이디', type: 'text', placeholder: '아이디 입력', required: true },
-              { label: '비밀번호', type: 'password', placeholder: '비밀번호 입력', required: true },
-              { label: '비밀번호 확인', type: 'password', placeholder: '비밀번호 재입력', required: true },
-              { label: '이름', type: 'text', placeholder: '이름 입력', required: true },
-            ].map((field, idx) => (
-              <Row key={idx}>
-                <Label className={field.required ? 'required' : ''}>{field.label}</Label>
-                <Input type={field.type} placeholder={field.placeholder} />
-              </Row>
-            ))}
-
-            <AddressRow>
-              <Label>주소</Label>
-              <Input type="text" placeholder="우편번호" />
-              <Button type="button">주소검색</Button>
-            </AddressRow>
             <Row>
-              <Label />
-              <Input type="text" placeholder="기본주소" />
+              <Label className="required">아이디</Label>
+              <Input
+                name="username"
+                value={form.username}
+                onChange={handleChange}
+                placeholder="아이디 입력"
+                required
+              />
             </Row>
             <Row>
-              <Label />
-              <Input type="text" placeholder="나머지 주소(선택 입력 가능)" />
+              <Label className="required">비밀번호</Label>
+              <Input
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="비밀번호 입력"
+                required
+              />
             </Row>
-
-            <PhoneRow>
-              <Label>일반전화</Label>
-              <Select><option>02</option><option>031</option><option>010</option></Select>
-              <Input type="text" />
-              <Input type="text" />
-            </PhoneRow>
-
-            <MobileRow>
-              <Label className="required">휴대전화</Label>
-              <Select><option>010</option><option>011</option></Select>
-              <Input type="text" />
-              <Input type="text" />
-            </MobileRow>
-
+            <Row>
+              <Label className="required">비밀번호 확인</Label>
+              <Input
+                name="passwordConfirm"
+                type="password"
+                value={form.passwordConfirm}
+                onChange={handleChange}
+                placeholder="비밀번호 재입력"
+                required
+              />
+            </Row>
+            <Row>
+              <Label className="required">이름</Label>
+              <Input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="이름 입력"
+                required
+              />
+            </Row>
             <Row>
               <Label>이메일</Label>
-              <Input type="email" placeholder="example@domain.com" />
+              <Input
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="example@domain.com"
+              />
+            </Row>
+            <Row>
+              <Label>휴대전화</Label>
+              <Input
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="010-1234-5678"
+              />
+            </Row>
+            <Row>
+              <Label>주소</Label>
+              <Input
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="서울시 강남구"
+              />
             </Row>
           </SectionContent>
         </SectionWrapper>
 
-        {/* 추가정보 */}
         <SectionWrapper>
           <SectionHeader>
             <span>추가정보</span>
           </SectionHeader>
           <SectionContent>
-            <Row style={{ flexWrap: 'nowrap' }}>
+            <Row style={{ flexWrap: "nowrap" }}>
               <Label className="required">성별</Label>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <label><input type="radio" name="gender" value="male" checked={gender === 'male'} onChange={() => setGender('male')} /> 남자</label>
-                <label><input type="radio" name="gender" value="female" checked={gender === 'female'} onChange={() => setGender('female')} /> 여자</label>
+              <div style={{ display: "flex", gap: "16px" }}>
+                <label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="male"
+                    checked={gender === "male"}
+                    onChange={() => {
+                      setGender("male");
+                      setForm({ ...form, gender: "male" });
+                    }}
+                  />{" "}
+                  남자
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="female"
+                    checked={gender === "female"}
+                    onChange={() => {
+                      setGender("female");
+                      setForm({ ...form, gender: "female" });
+                    }}
+                  />{" "}
+                  여자
+                </label>
               </div>
             </Row>
             <Row>
               <Label className="required">생년월일</Label>
-              <Input type="text" placeholder="년" style={{ maxWidth: '80px' }} />
-              <Input type="text" placeholder="월" style={{ maxWidth: '50px' }} />
-              <Input type="text" placeholder="일" style={{ maxWidth: '50px' }} />
+              <Input
+                name="birth"
+                value={form.birth}
+                onChange={handleChange}
+                placeholder="YYYY-MM-DD"
+                style={{ maxWidth: "150px" }}
+              />
             </Row>
           </SectionContent>
         </SectionWrapper>
 
-        <SubmitButton>가입하기</SubmitButton>
+        <SubmitButton type="submit">가입하기</SubmitButton>
       </Content>
     </PageWrapper>
   );
