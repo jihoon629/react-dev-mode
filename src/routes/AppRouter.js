@@ -23,7 +23,7 @@ const AppRouter = () => {
       {/* Main App Layout - All pages below share the AppLayOut */}
       <Route element={<AppLayOut />}>
         {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<WillDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
