@@ -351,7 +351,7 @@ const AppLayout = () => {
           <FooterColumn>
             <h5>서비스</h5>
             <div onClick={() => navigate("/write")}>유언장 작성</div>
-            <div>공증 서비스</div>
+            <div onClick={() => navigate("/notary-service")}>공증 서비스</div>
             <div onClick={() => navigate("/success")}>유언장 관리</div>
             <div>보안 정책</div>
           </FooterColumn>

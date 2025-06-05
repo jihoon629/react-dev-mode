@@ -1,12 +1,48 @@
+export const MemberTypeToggle = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: #fff;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px 0px;
+`;
+
+export const ToggleButton = styled.button`
+  background: none;
+  width: 200px;
+  border-radius: 10px;
+  border: none;
+  font-size: 18px;
+  padding: 10px 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s, background-color 0.3s;
+  font-weight: normal;
+
+  &.active {
+    color: #574bff;
+    background-color: #e6eeff;
+  }
+
+  &:not(.active):hover {
+    color: #574bff;
+    background-color: #f0f4ff;
+  }
+`;
 // components/styles/LoginPageStyles.js
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 20px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   color: #333;
 `;
 
