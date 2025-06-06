@@ -10,11 +10,12 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await willService.loginUser({ username, password });
       const { user } = response.data;
-      const { id: userId, username: userNameFromServer, name: realName } = user;
-
+      const { id: userId, username: userNameFromServer, name: realName, role:role} = user;
       sessionStorage.setItem("username", username);
       sessionStorage.setItem("userId", userId);
       sessionStorage.setItem("realName", realName);
+      sessionStorage.setItem("role", role);
+
 
       dispatch(
         showToastMessage({
