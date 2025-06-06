@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { registerUser } from "../../features/user/userSlice";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -140,6 +143,8 @@ const Checkbox = styled.input`
 `;
 
 const PersonalRegisterPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -187,7 +192,7 @@ const PersonalRegisterPage = () => {
       role: "USER",
     };
     console.log("회원가입 요청:", requestBody);
-    // dispatch(registerUser({ values: form, navigate })) // Uncomment and import dispatch and navigate as needed
+    dispatch(registerUser({ values: form, navigate }));
   };
 
   return (
