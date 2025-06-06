@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FaFacebookF, FaTwitter, FaUser } from "react-icons/fa";
@@ -8,9 +8,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import ToastMessage from "../common/component/ToastMessage";
-import { useEffect } from "react";
-
-/* --- Styled Components 생략된 부분은 동일 --- */
 
 const Container = styled.div`
   background-color: #f9fafb;
@@ -30,26 +27,39 @@ const Navbar = styled.header`
 `;
 
 const Logo = styled.div`
-  font-weight: 700;
-  font-size: 20px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 800;
+  font-size: 22px;
   color: #111827;
   cursor: pointer;
-`;
+  position: relative;
+  transition: color 0.3s;
 
-const NavMenu = styled.nav`
-  display: flex;
-  gap: 32px;
-  font-size: 14px;
+  &:hover {
+    color: #6366f1;
+  }
 
-  button {
-    background: none;
-    border: none;
-    color: #4b5563;
-    font-size: 14px;
-    cursor: pointer;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 3px;
+    background: #6366f1;
+    transition: width 0.3s ease;
+  }
 
-    &:hover {
-      color: #6366f1;
+  &:hover::after {
+    width: 100%;
+  }
+
+  animation: fadeIn 1s ease forwards;
+  opacity: 0;
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
     }
   }
 `;
@@ -59,25 +69,34 @@ const NavButtons = styled.div`
   align-items: center;
   gap: 12px;
   position: relative;
+`;
 
-  button {
-    font-size: 14px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
+const NavButton = styled.button`
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid #6366f1;
+  border-radius: 9999px;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+`;
+
+const LoginButton = styled(NavButton)`
+  background: transparent;
+  color: #6366f1;
+
+  &:hover {
+    background: #eef2ff;
   }
+`;
 
-  .login {
-    background-color: transparent;
-    color: #6366f1;
-    border: 1px solid #6366f1;
-  }
+const SignupButton = styled(NavButton)`
+  background: #6366f1;
+  color: #ffffff;
 
-  .signup {
-    background-color: #6366f1;
-    color: white;
-    border: none;
+  &:hover {
+    background: #4f46e5;
   }
 `;
 
@@ -243,30 +262,19 @@ const FooterBottom = styled.div`
   }
 `;
 
-/* ---------------- COMPONENT ---------------- */
-
 const AppLayout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { realName, username } = useSelector((state) => state.user);
   const isLoggedIn = !!username;
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
-    setDropdownOpen(false); // 로그인/로그아웃할 때마다 드롭다운은 닫힘
+    setDropdownOpen(false);
   }, [isLoggedIn]);
 
-  const handleScrollToSection = (sectionId) => {
-    navigate("/");
-    setTimeout(() => {
-      const section = document.getElementById(sectionId);
-      if (section) section.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  };
-
   const handleLogout = () => {
-    dispatch(logoutUser()); // ✅ 내부에서 토스트 메시지 디스패치
+    dispatch(logoutUser());
     sessionStorage.clear();
     navigate("/");
   };
@@ -278,22 +286,9 @@ const AppLayout = () => {
 
   return (
     <Container>
-      <ToastMessage /> {/* ✅ 상태 기반 토스트 메시지 전역 처리 */}
+      <ToastMessage />
       <Navbar>
         <Logo onClick={() => navigate("/")}>마침표</Logo>
-        <NavMenu>
-          <button onClick={() => handleScrollToSection("service")}>
-            서비스 소개
-          </button>
-          <button onClick={() => handleScrollToSection("features")}>
-            특징
-          </button>
-          <button onClick={() => handleScrollToSection("review")}>
-            이용 후기
-          </button>
-          <button onClick={() => handleScrollToSection("faq")}>FAQ</button>
-        </NavMenu>
-
         <NavButtons>
           {isLoggedIn ? (
             <UserTab>
@@ -308,23 +303,15 @@ const AppLayout = () => {
               </UserProfile>
               {dropdownOpen && (
                 <DropdownMenu>
-                  <DropdownItem onClick={handleGoMypage}>
-                    마이페이지
-                  </DropdownItem>
-                  <DropdownItem as={LogoutButton} onClick={handleLogout}>
-                    로그아웃
-                  </DropdownItem>
+                  <DropdownItem onClick={handleGoMypage}>마이페이지</DropdownItem>
+                  <DropdownItem as={LogoutButton} onClick={handleLogout}>로그아웃</DropdownItem>
                 </DropdownMenu>
               )}
             </UserTab>
           ) : (
             <>
-              <button className="login" onClick={() => navigate("/login")}>
-                로그인
-              </button>
-              <button className="signup" onClick={() => navigate("/register")}>
-                회원가입
-              </button>
+              <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
+              <SignupButton onClick={() => navigate("/register")}>회원가입</SignupButton>
             </>
           )}
         </NavButtons>
@@ -347,7 +334,6 @@ const AppLayout = () => {
               <FaUser />
             </div>
           </FooterBrand>
-
           <FooterColumn>
             <h5>서비스</h5>
             <div onClick={() => navigate("/write")}>유언장 작성</div>
@@ -355,7 +341,6 @@ const AppLayout = () => {
             <div onClick={() => navigate("/success")}>유언장 관리</div>
             <div>보안 정책</div>
           </FooterColumn>
-
           <FooterColumn>
             <h5>회사 정보</h5>
             <div>회사 소개</div>
@@ -364,7 +349,6 @@ const AppLayout = () => {
             <div>문의하기</div>
           </FooterColumn>
         </FooterTop>
-
         <FooterBottom>
           <div>© 2023 마침표. All rights reserved.</div>
           <div>
