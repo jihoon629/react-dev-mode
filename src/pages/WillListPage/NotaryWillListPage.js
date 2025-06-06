@@ -81,7 +81,11 @@ const WillListPage = () => {
 
               <InfoRow>
                 <HashText>{will.hash}</HashText>
-                <FaCopy size={16} color="#6b7280" style={{ cursor: "pointer" }} />
+                <FaCopy
+                  size={16}
+                  color="#6b7280"
+                  style={{ cursor: "pointer" }}
+                />
                 {will.blockchainRegistered && (
                   <Label $blockchain>블록체인 등록됨</Label>
                 )}

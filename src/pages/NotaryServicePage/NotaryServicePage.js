@@ -7,6 +7,7 @@ import {
   FaHandPointer,
   FaLightbulb,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const isNotary = true; // replace with real logic based on user role
 
@@ -158,6 +159,8 @@ const CreateServiceButton = styled.button`
 `;
 
 const NotaryServicePage = () => {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <div
@@ -169,7 +172,9 @@ const NotaryServicePage = () => {
       >
         <Header>공증인 목록</Header>
         {isNotary && (
-          <CreateServiceButton>
+          <CreateServiceButton
+            onClick={() => navigate("/notary-service/create")}
+          >
             <FaPlus /> 공증 서비스 등록하기
           </CreateServiceButton>
         )}

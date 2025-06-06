@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // Layout
 import AppLayOut from "../Layout/AppLayOut";
@@ -13,13 +14,18 @@ import NotaryRegisterPage from "../pages/RegisterPage/NotaryRegisterPage";
 import WillWritePage from "../pages/WillWritePage";
 import WillDetailPage from "../pages/WillDetailPage";
 import NotFoundPage from "../pages/NotFoundPage";
-import WillList from "../pages/WillListPage/WillListPage";
 import WillDetails from "../pages/WillDetailPage";
 import UserProfileComponent from "../components/UserProfileComponent";
 import UserMyPage from "../pages/MyPage/MyPage";
 import NotaryServicePage from "../pages/NotaryServicePage/NotaryServicePage";
-import AdminManagement from "../pages/AdminManagement/AdminManagement"
+import NotaryServiceCreatePage from "../pages/NotaryServicePage/NotaryServiceCreatePage";
+import AdminManagement from "../pages/AdminManagement/AdminManagement";
+import UserWillListPage from "../pages/WillListPage/UserWillListPage";
+import NotaryWillListPage from "../pages/WillListPage/NotaryWillListPage";
+
 const AppRouter = () => {
+  const userType = useSelector((state) => state.auth?.user?.userType);
+
   return (
     <Routes>
       {/* Main App Layout - All pages below share the AppLayOut */}
@@ -37,15 +43,26 @@ const AppRouter = () => {
         <Route path="/write" element={<WillWritePage />} />
         {/* Dynamic route for Will detail, supports backend integration */}
         <Route path="/will/:willId" element={<WillDetailPage />} />
-        <Route path="/success" element={<WillList />} />
+        <Route
+          path="/success"
+          element={
+            userType === "NOTARY" ? (
+              <NotaryWillListPage />
+            ) : (
+              <UserWillListPage />
+            )
+          }
+        />
         <Route path="/detail/:willId" element={<WillDetails />} />
         <Route path="/name" element={<UserProfileComponent />} />
         <Route path="/MyPage" element={<UserMyPage />} />
         <Route path="/notary-service" element={<NotaryServicePage />} />
+        <Route
+          path="/notary-service/create"
+          element={<NotaryServiceCreatePage />}
+        />
 
-        
         <Route path="/admin" element={<AdminManagement />} />
-
       </Route>
 
       {/* Catch-All Not Found Page */}
