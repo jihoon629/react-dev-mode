@@ -1,7 +1,7 @@
 import axios from "axios"; //백엔드 API 호출 모듈 (axios)
 
 // 이 baseURL 설정은 유지합니다. 각 API 호출은 이 URL 뒤에 붙는 상대 경로를 사용합니다.
-axios.defaults.baseURL = "http://192.168.72.129:8001";
+axios.defaults.baseURL = "http://localhost:8001";
 
 /**
  * 텍스트 기반 유언장을 등록합니다.
@@ -139,6 +139,7 @@ const loginUser = (credentials) => axios.post("/auth/login", credentials);
  * 백엔드 엔드포인트: POST /auth/register (routes.js 기준)
  */
 const registerUser = (userData) => axios.post("/auth/register", userData);
+const registerNotary = (notaryData) => axios.post("/auth/register", notaryData); // 이 함수를 추가하세요.
 
 /**
  * 사용자 이름(username)으로 실제 이름(realName)을 조회합니다.
@@ -177,9 +178,29 @@ const getWillImageByImageRecordId = (imageRecordId) => {
  * 사용자 프로필 조회 (GET /mypage/profile)
  */
 const getUserProfile = async (username) => {
-  if (!username) throw new Error("Username is required.");
-  const response = await axios.get("/mypage/profile", { params: { username } });
-  return response.data;
+  if (!username) {
+    throw new Error("Username is required to fetch user profile.");
+  }
+  try {
+    const response = await axios.get(`/kkk/${username}`); // URL 변경: 경로 파라미터 사용
+    return response.data;
+  } catch (error) {
+    console.error(
+      `willService.getUserProfile: Failed for user ${username}`,
+      error.response?.data || error.message
+    );
+    if (error.response) {
+      const serviceError = new Error(
+        error.response.data.message ||
+          error.response.data.error ||
+          "Failed to get user profile"
+      );
+      serviceError.status = error.response.status;
+      serviceError.data = error.response.data;
+      throw serviceError;
+    }
+    throw error;
+  }
 };
 
 /**
@@ -219,9 +240,141 @@ const updateUserProfileExtended = async ({
     role,
   });
 };
+const getWillStatusCounts = async (username) => {
+  if (!username) {
+    throw new Error("Username is required to fetch will status counts.");
+  }
+  try {
+    const response = await axios.get(`/mypage/status-counts/${username}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `willService.getWillStatusCounts: Failed for user ${username}`,
+      error.response?.data || error.message
+    );
+    if (error.response) {
+      const serviceError = new Error(
+        error.response.data.message ||
+          error.response.data.error ||
+          "Failed to get will status counts"
+      );
+      serviceError.status = error.response.status;
+      serviceError.data = error.response.data;
+      throw serviceError;
+    }
+    throw error;
+  }
+};
 
+
+
+
+
+const getAllWillsByAdmin = async () => {
+  try {
+    // localStorage에서 사용자 이름을 가져옵니다. 키를 'username'으로 변경합니다.
+    const storedUsername = sessionStorage.getItem('username'); 
+
+    console.log(`getAllWillsByAdmin: Username from localStorage ('username'): >>${storedUsername}<<`);
+    
+    const config = {
+      headers: {},
+      withCredentials: true // 기존 옵션 유지
+    };
+
+    // storedUsername이 존재하고 빈 문자열이 아닌지 확인합니다.
+    if (storedUsername && storedUsername.trim() !== '') {
+      // 'X-User-Username' 헤더에 사용자 이름을 추가합니다.
+      config.headers['X-User-Username'] = storedUsername;
+      console.log(`getAllWillsByAdmin: Attempting to set X-User-Username header with value: ${storedUsername}`);
+    } else {
+      console.log('getAllWillsByAdmin: Username from localStorage is null, empty, or whitespace. Header NOT set.');
+    }
+    console.log('getAllWillsByAdmin: Config object before request:', JSON.stringify(config, null, 2));
+
+
+    const response = await axios.get(`/admin/wills`, config);
+    return response.data;
+  } catch (error) {
+    console.error(`willService.getAllWillsByAdmin: Failed to fetch all wills`, error.response?.data || error.message);
+    if (error.response) {
+        const serviceError = new Error(error.response.data.message || error.response.data.error || 'Failed to get all wills for admin');
+        serviceError.status = error.response.status;
+        serviceError.data = error.response.data;
+        throw serviceError;
+    }
+    throw error;
+  }
+};
+
+const getWillDetailByIdAdmin = async (willId) => {
+  if (!willId) {
+    throw new Error("Will ID is required for fetching will details by admin.");
+  }
+  try {
+    // sessionStorage에서 사용자 이름을 가져옵니다.
+    const storedUsername = sessionStorage.getItem('username'); 
+    console.log(`getWillDetailByIdAdmin: Username from sessionStorage ('username'): >>${storedUsername}<<`);
+    
+    const config = {
+      headers: {},
+      withCredentials: true // 기존 옵션 유지
+    };
+
+    // storedUsername이 존재하고 빈 문자열이 아닌지 확인합니다.
+    if (storedUsername && storedUsername.trim() !== '') {
+      // 'X-User-Username' 헤더에 사용자 이름을 추가합니다.
+      config.headers['X-User-Username'] = storedUsername;
+      console.log(`getWillDetailByIdAdmin: Attempting to set X-User-Username header with value: ${storedUsername}`);
+    } else {
+      console.log('getWillDetailByIdAdmin: Username from sessionStorage is null, empty, or whitespace. Header NOT set.');
+    }
+    console.log(`getWillDetailByIdAdmin: Config object before request for willId ${willId}:`, JSON.stringify(config, null, 2));
+
+    // withCredentials: true 옵션으로 인증된 요청을 보냅니다.
+    const response = await axios.get(`/admin/wills/${willId}`, config);
+    return response.data;
+  } catch (error) {
+    console.error(`willService.getWillDetailByIdAdmin: Failed for ID ${willId}`, error.response?.data || error.message);
+    if (error.response) {
+        const serviceError = new Error(error.response.data.message || error.response.data.error || `Failed to get will detail (ID: ${willId}) for admin`);
+        serviceError.status = error.response.status;
+        serviceError.data = error.response.data;
+        throw serviceError;
+    }
+    throw error;
+  }
+};
+const updateWillStatusAdmin = async (willId, newStatus) => {
+  if (!willId || !newStatus) {
+    throw new Error("Will ID and new status are required for updating status by admin.");
+  }
+  try {
+    const storedUsername = sessionStorage.getItem('username');
+    const config = {
+      headers: { 'Content-Type': 'application/json' }, // 요청 본문이 JSON임을 명시
+      withCredentials: true
+    };
+    if (storedUsername && storedUsername.trim() !== '') {
+      config.headers['X-User-Username'] = storedUsername;
+    }
+
+    // 요청 본문에 newStatus를 포함
+    const response = await axios.put(`/admin/wills/${willId}/status`, { newStatus }, config);
+    return response.data; // { message: "...", willId: "...", newStatus: "..." } 형태의 응답 예상
+  } catch (error) {
+    console.error(`willService.updateWillStatusAdmin: Failed for ID ${willId} to status ${newStatus}`, error.response?.data || error.message);
+    if (error.response) {
+        const serviceError = new Error(error.response.data.message || error.response.data.error || `Failed to update will status (ID: ${willId}) for admin`);
+        serviceError.status = error.response.status;
+        serviceError.data = error.response.data;
+        throw serviceError;
+    }
+    throw error;
+  }
+};
 // 정의된 모든 함수들을 export 합니다.
-export default {
+export default {registerNotary,
   registerWill,
   getWillDetails, // getWillDetailsService 대신 getWillDetails를 export (또는 반대로 통일)
   getMyWills,
@@ -236,4 +389,8 @@ export default {
   updatePassword,
   updateUserProfile,
   updateUserProfileExtended,
+  getWillStatusCounts,
+  getAllWillsByAdmin,
+  getWillDetailByIdAdmin,
+  updateWillStatusAdmin
 };

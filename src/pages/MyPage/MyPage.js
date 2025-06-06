@@ -1,57 +1,165 @@
-// src/pages/MyPage/MyPage.js
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import {
-  MyPageContainer, MyPageProfile, ProfileInfo, ProfileImage, ProfileText,
-  ProfileName, ProfileEmail, ProfileDate, EditProfileButton, MyPageStats,
-  StatCard, StatValue, StatLabel, MyPageActions, ActionButton, MyPageColumns,
-  MyPageRecent, MyPageSide, Box, SettingsList, SettingsItem,
-  LinkedServicesText, LogoutButton, ActivityItem
-} from './style/MyPageStyle';
+  MyPageContainer,
+  MyPageProfile,
+  ProfileInfo,
+  ProfileImage,
+  ProfileText,
+  ProfileName,
+  ProfileEmail,
+  ProfileDate,
+  EditProfileButton,
+  MyPageStats,
+  StatCard,
+  StatValue,
+  StatLabel,
+  MyPageActions,
+  ActionButton,
+  MyPageColumns,
+  MyPageRecent,
+  MyPageSide,
+  Box,
+  SettingsList,
+  SettingsItem,
+  LinkedServicesText,
+  LogoutButton,
+  ActivityItem,
+} from "./style/MyPageStyle";
+import { useSelector } from "react-redux";
+import willService from "../../services/willService";
 import {
   FaFileSignature,
   FaUserFriends,
   FaShieldAlt,
-  FaHistory,
   FaUserShield,
   FaBell,
   FaCog,
   FaAngleRight,
   FaLink,
-  FaSignOutAlt
-} from 'react-icons/fa';
+  FaSignOutAlt,
+  FaHistory,
+} from "react-icons/fa";
 
 const MyPage = () => {
+  const { username } = useSelector((state) => state.user);
+
+  const [viewerWills, setViewerWills] = useState([]);
+  const [profile, setProfile] = useState({
+    name: "이름 없음",
+    email: "이메일 정보 없음",
+    phone: "전화번호 정보 없음",
+    birthDate: "생년월일 정보 없음",
+    joinDate: "가입일 정보 없음",
+  });
+  const [statusCounts, setStatusCounts] = useState({
+    REGISTERED: 0,
+    ACTIVE: 0,
+    EXECUTED: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    console.log("📛 현재 로그인된 사용자 username:", username);
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [profileData, countsData] = await Promise.all([
+          willService.getUserProfile(username),
+          willService.getWillStatusCounts(username),
+        ]);
+
+        if (profileData) {
+          console.log("🙋‍♀️ 사용자 프로필 응답:", profileData);
+          setProfile({
+            name: profileData.name || "이름 없음",
+            email: "이메일 정보 없음",
+            phone: profileData.phone || "전화번호 정보 없음",
+            birthDate: profileData.birth
+              ? profileData.birth.slice(0, 10)
+              : "생년월일 정보 없음",
+            joinDate: "가입일 정보 없음",
+          });
+        } else {
+          setProfile({
+            name: "이름 없음",
+            email: "이메일 정보 없음",
+            phone: "전화번호 정보 없음",
+            birthDate: "생년월일 정보 없음",
+            joinDate: "가입일 정보 없음",
+          });
+        }
+
+        console.log("📊 유언장 상태별 개수 응답:", countsData);
+        setStatusCounts(countsData || { REGISTERED: 0, ACTIVE: 0, EXECUTED: 0 });
+      } catch (error) {
+        console.error("❌ 마이페이지 데이터 로딩 실패:", error);
+        setProfile({
+          name: "이름 없음",
+          email: "이메일 정보 없음",
+          phone: "전화번호 정보 없음",
+          birthDate: "생년월일 정보 없음",
+          joinDate: "가입일 정보 없음",
+        });
+        setStatusCounts({ REGISTERED: 0, ACTIVE: 0, EXECUTED: 0 });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (username) {
+      fetchData();
+    } else {
+      console.warn("⚠️ username이 없어서 API 요청을 생략합니다.");
+      setLoading(false);
+      setProfile({
+        name: "이름 없음",
+        email: "이메일 정보 없음",
+        phone: "전화번호 정보 없음",
+        birthDate: "생년월일 정보 없음",
+        joinDate: "가입일 정보 없음",
+      });
+      setStatusCounts({ REGISTERED: 0, ACTIVE: 0, EXECUTED: 0 });
+    }
+  }, [username]);
+
+  if (loading) return <div>⏳ 마이페이지 로딩 중...</div>;
+
+  const willStats = [
+    { label: "작성 중인 유언장", value: statusCounts.REGISTERED || 0 },
+    { label: "공증 진행 중", value: statusCounts.ACTIVE || 0 },
+    { label: "공증 완료", value: statusCounts.EXECUTED || 0 },
+  ];
+
   return (
     <MyPageContainer>
-      {/* 프로필 */}
       <MyPageProfile>
         <ProfileInfo>
           <ProfileImage src="/images/kim.PNG" alt="프로필 사진" />
           <ProfileText>
-            <ProfileName>김용현</ProfileName>
-            <ProfileEmail>kim.yh@example.com</ProfileEmail>
-            <ProfileDate>가입일: 2023년 8월</ProfileDate>
+            <ProfileName>{profile.name}</ProfileName>
+            <ProfileEmail>이메일: {profile.email}</ProfileEmail>
+            <ProfileEmail>전화번호: {profile.phone}</ProfileEmail>
+            <ProfileEmail>생년월일: {profile.birthDate}</ProfileEmail>
+            <ProfileDate>가입일: {profile.joinDate}</ProfileDate>
           </ProfileText>
         </ProfileInfo>
         <EditProfileButton>프로필 수정</EditProfileButton>
       </MyPageProfile>
 
-      {/* 유언장 통계 */}
       <MyPageStats>
-        {[
-          { label: '작성 중인 유언장', value: 2 },
-          { label: '공증 진행 중', value: 1 },
-          { label: '공증 완료', value: 3 },
-          { label: '지정 열람자', value: 5 },
-        ].map((item, i) => (
-          <StatCard key={i}>
-            <StatValue>{item.value}</StatValue>
-            <StatLabel>{item.label}</StatLabel>
+        {willStats.map((stat, idx) => (
+          <StatCard key={idx}>
+            <StatValue>{stat.value}</StatValue>
+            <StatLabel>{stat.label}</StatLabel>
           </StatCard>
         ))}
+        <StatCard>
+          <StatValue>{viewerWills.length}</StatValue>
+          <StatLabel>지정 열람자</StatLabel>
+        </StatCard>
       </MyPageStats>
 
-      {/* 빠른 작업 */}
       <MyPageActions>
         <ActionButton>
           <FaFileSignature size={24} />
@@ -67,16 +175,15 @@ const MyPage = () => {
         </ActionButton>
       </MyPageActions>
 
-      {/* 최근 활동 + 설정 */}
       <MyPageColumns>
         <MyPageRecent>
           <h4>최근 활동</h4>
           <ul>
             {[
-              { text: '주 유언장 내용 수정', date: '2023.11.15' },
-              { text: '새로운 열람자 추가: 김미란', date: '2023.11.13' },
-              { text: '유언장 공증 완료', date: '2023.11.10' },
-              { text: '2단계 인증 활성화', date: '2023.11.08' },
+              { text: "주 유언장 내용 수정", date: "2023.11.15" },
+              { text: "새로운 열람자 추가: 김미란", date: "2023.11.13" },
+              { text: "유언장 공증 완료", date: "2023.11.11" },
+              { text: "2단계 인증 활성화", date: "2023.11.09" },
             ].map((item, i) => (
               <li key={i}>
                 <ActivityItem>
@@ -90,14 +197,13 @@ const MyPage = () => {
         </MyPageRecent>
 
         <MyPageSide>
-          {/* 보안 설정 */}
           <Box>
             <h4>보안 설정</h4>
             <SettingsList>
               {[
-                { label: '2단계 인증', icon: <FaUserShield /> },
-                { label: '알림 설정', icon: <FaBell /> },
-                { label: '계정 설정', icon: <FaCog /> },
+                { label: "2단계 인증", icon: <FaUserShield /> },
+                { label: "알림 설정", icon: <FaBell /> },
+                { label: "계정 설정", icon: <FaCog /> },
               ].map((item, i) => (
                 <li key={i}>
                   <SettingsItem>
@@ -110,7 +216,6 @@ const MyPage = () => {
             </SettingsList>
           </Box>
 
-          {/* 연동 서비스 */}
           <Box>
             <h4>연동 서비스</h4>
             <LinkedServicesText>
@@ -121,7 +226,6 @@ const MyPage = () => {
             </LinkedServicesText>
           </Box>
 
-          {/* 로그아웃 */}
           <LogoutButton>
             <FaSignOutAlt className="icon" />
             로그아웃

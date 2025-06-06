@@ -289,6 +289,13 @@ const AppLayout = () => {
       <ToastMessage />
       <Navbar>
         <Logo onClick={() => navigate("/")}>마침표</Logo>
+        <NavMenu>
+          <button onClick={() => navigate("/write")}>유언장 작성</button>
+          <button onClick={() => navigate("/notary-service")}>
+            공증 서비스
+          </button>
+          <button onClick={() => navigate("/success")}>유언장 관리</button>
+        </NavMenu>
         <NavButtons>
           {isLoggedIn ? (
             <UserTab>
@@ -310,8 +317,12 @@ const AppLayout = () => {
             </UserTab>
           ) : (
             <>
-              <LoginButton onClick={() => navigate("/login")}>로그인</LoginButton>
-              <SignupButton onClick={() => navigate("/register")}>회원가입</SignupButton>
+              <button className="login" onClick={() => navigate("/login")}>
+                로그인
+              </button>
+              <button className="signup" onClick={() => navigate("/login")}>
+                회원가입
+              </button>
             </>
           )}
         </NavButtons>
@@ -335,11 +346,13 @@ const AppLayout = () => {
             </div>
           </FooterBrand>
           <FooterColumn>
-            <h5>서비스</h5>
-            <div onClick={() => navigate("/write")}>유언장 작성</div>
-            <div>공증 서비스</div>
-            <div onClick={() => navigate("/success")}>유언장 관리</div>
-            <div>보안 정책</div>
+            <h5>서비스 </h5>
+            <div onClick={() => handleScrollToSection("service")}>
+              서비스 소개
+            </div>
+            <div onClick={() => handleScrollToSection("features")}>특징</div>
+            <div onClick={() => handleScrollToSection("review")}>이용 후기</div>
+            <div onClick={() => handleScrollToSection("faq")}>FAQ</div>
           </FooterColumn>
           <FooterColumn>
             <h5>회사 정보</h5>
