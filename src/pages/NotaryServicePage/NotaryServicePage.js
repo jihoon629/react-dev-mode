@@ -8,8 +8,7 @@ import {
   FaLightbulb,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-const isNotary = true; // replace with real logic based on user role
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
   max-width: 850px;
@@ -159,6 +158,8 @@ const CreateServiceButton = styled.button`
 `;
 
 const NotaryServicePage = () => {
+  const userType = useSelector((state) => state.user?.user?.userType);
+  const isNotary = userType === "NOTARY";
   const navigate = useNavigate();
 
   return (
