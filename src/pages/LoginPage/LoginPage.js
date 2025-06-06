@@ -14,6 +14,30 @@ import {
   LoginFindLinks,
   LoginSignupBox,
 } from "./style/LoginPageStyle";
+const MemberTooltip = styled.div`
+  background-color: #fff;
+  color: #444;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  margin-bottom: 12px;
+  max-width: 320px;
+  text-align: center;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0 8px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+  }
+`;
 import { loginUser } from "./../../features/user/userSlice";
 
 const MemberTypeToggle = styled.div`
@@ -189,6 +213,9 @@ const LoginPage = () => {
         <a href="#">아이디 찾기</a>|<a href="#">비밀번호 찾기</a>
       </LoginFindLinks>
 
+      <MemberTooltip>
+        선택한 회원 유형: {memberType === "notary" ? "공증인" : "일반 사용자"}
+      </MemberTooltip>
       <LoginSignupBox>
         <span>아직 회원이 아니신가요?</span>
         <Link

@@ -7,8 +7,8 @@ import {
   FaHandPointer,
   FaLightbulb,
 } from "react-icons/fa";
-
-const isNotary = true; // replace with real logic based on user role
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
   max-width: 850px;
@@ -158,6 +158,10 @@ const CreateServiceButton = styled.button`
 `;
 
 const NotaryServicePage = () => {
+  const userType = useSelector((state) => state.user?.user?.userType);
+  const isNotary = userType === "NOTARY";
+  const navigate = useNavigate();
+
   return (
     <Container>
       <div
@@ -169,7 +173,9 @@ const NotaryServicePage = () => {
       >
         <Header>공증인 목록</Header>
         {isNotary && (
-          <CreateServiceButton>
+          <CreateServiceButton
+            onClick={() => navigate("/notary-service/create")}
+          >
             <FaPlus /> 공증 서비스 등록하기
           </CreateServiceButton>
         )}

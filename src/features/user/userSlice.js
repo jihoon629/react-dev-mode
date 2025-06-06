@@ -9,7 +9,6 @@ export const loginUser = createAsyncThunk(
   async ({ username, password }, { dispatch, rejectWithValue }) => {
     try {
       const response = await willService.loginUser({ username, password });
-
       const { user } = response.data;
       const { id: userId, username: userNameFromServer, name: realName } = user;
 
@@ -28,50 +27,39 @@ export const loginUser = createAsyncThunk(
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "로그인에 실패했습니다.";
-      error.response?.data?.message || "로그인에 실패했습니다.";
-
       dispatch(
         showToastMessage({
           message: errorMessage,
           status: "error",
-          status: "error",
         })
       );
-
       return rejectWithValue(errorMessage);
     }
   }
 );
 
-// 회원가입
+// 일반 회원가입
 export const registerUser = createAsyncThunk(
-  "user/registerUser",
   "user/registerUser",
   async (userData, { dispatch, rejectWithValue }) => {
     try {
       const response = await willService.registerUser(userData);
-
       dispatch(
         showToastMessage({
           message: "회원가입이 완료되었습니다. 로그인해주세요!",
           status: "success",
-          message: "회원가입이 완료되었습니다. 로그인해주세요!",
-          status: "success",
         })
       );
-
       return response.data;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "회원가입에 실패했습니다.";
-
       dispatch(
         showToastMessage({
           message: errorMessage,
           status: "error",
         })
       );
-
       return rejectWithValue(errorMessage);
     }
   }
@@ -115,14 +103,13 @@ export const logoutUser = createAsyncThunk(
   async (_, { dispatch }) => {
     sessionStorage.removeItem("username");
     sessionStorage.removeItem("userId");
-
+    sessionStorage.removeItem("realName");
     dispatch(
       showToastMessage({
         message: "성공적으로 로그아웃되었습니다.",
         status: "success",
       })
     );
-    return;
   }
 );
 
@@ -193,12 +180,9 @@ const userSlice = createSlice({
         state.username = null;
         state.userId = null;
         state.realName = null;
-        sessionStorage.removeItem("realName");
       });
   },
 });
 
 export const { clearUserError } = userSlice.actions;
-// 개별 export는 이미 위에서 했으므로 중복 제거
-// export { loginUser, logoutUser, registerUser, registerNotary }; 삭제
 export default userSlice.reducer;
