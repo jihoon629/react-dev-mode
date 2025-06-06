@@ -27,6 +27,18 @@ import {
 } from "./style/MyPageStyle";
 import { useSelector } from "react-redux";
 import willService from "../../services/willService";
+import {
+  FaFileSignature,
+  FaUserFriends,
+  FaShieldAlt,
+  FaUserShield,
+  FaBell,
+  FaCog,
+  FaAngleRight,
+  FaLink,
+  FaSignOutAlt,
+  FaHistory,
+} from "react-icons/fa";
 
 const MyPage = () => {
   const { username } = useSelector((state) => state.user);
@@ -34,10 +46,10 @@ const MyPage = () => {
   const [viewerWills, setViewerWills] = useState([]);
   const [profile, setProfile] = useState({
     name: "이름 없음",
-    email: "이메일 정보 없음", // 기본값 설정
-    phone: "전화번호 정보 없음", // 필드 추가 및 기본값
-    birthDate: "생년월일 정보 없음", // 필드 추가 및 기본값
-    joinDate: "가입일 정보 없음", // 기본값 설정
+    email: "이메일 정보 없음",
+    phone: "전화번호 정보 없음",
+    birthDate: "생년월일 정보 없음",
+    joinDate: "가입일 정보 없음",
   });
   const [statusCounts, setStatusCounts] = useState({
     REGISTERED: 0,
@@ -52,7 +64,6 @@ const MyPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // getDesignatedViewersWills는 아직 구현되지 않았으므로 호출에서 제외
         const [profileData, countsData] = await Promise.all([
           willService.getUserProfile(username),
           willService.getWillStatusCounts(username),
@@ -62,16 +73,15 @@ const MyPage = () => {
           console.log("🙋‍♀️ 사용자 프로필 응답:", profileData);
           setProfile({
             name: profileData.name || "이름 없음",
-            email: "이메일 정보 없음", // profileData에 email이 없으므로 기본값 사용
+            email: "이메일 정보 없음",
             phone: profileData.phone || "전화번호 정보 없음",
             birthDate: profileData.birth
-              ? profileData.birth.slice(0, 10) // YYYY-MM-DD 형식으로 표시
+              ? profileData.birth.slice(0, 10)
               : "생년월일 정보 없음",
-            joinDate: "가입일 정보 없음", // profileData에 가입일 정보가 없으므로 기본값 사용
+            joinDate: "가입일 정보 없음",
           });
         } else {
-           // profileData가 없을 경우 기본값 유지 또는 오류 처리
-           setProfile({
+          setProfile({
             name: "이름 없음",
             email: "이메일 정보 없음",
             phone: "전화번호 정보 없음",
@@ -80,12 +90,10 @@ const MyPage = () => {
           });
         }
 
-
         console.log("📊 유언장 상태별 개수 응답:", countsData);
         setStatusCounts(countsData || { REGISTERED: 0, ACTIVE: 0, EXECUTED: 0 });
       } catch (error) {
         console.error("❌ 마이페이지 데이터 로딩 실패:", error);
-        // 오류 발생 시 프로필 및 상태 초기화
         setProfile({
           name: "이름 없음",
           email: "이메일 정보 없음",
@@ -125,20 +133,19 @@ const MyPage = () => {
 
   return (
     <MyPageContainer>
-    <MyPageProfile>
-      <ProfileInfo>
-        <ProfileImage src="/images/kim.PNG" alt="프로필 사진" />
-        <ProfileText>
-          <ProfileName>{profile.name}</ProfileName>
-          <ProfileEmail>이메일: {profile.email}</ProfileEmail>
-          <ProfileEmail>전화번호: {profile.phone}</ProfileEmail> {/* ProfileEmail 스타일 재활용 */}
-          <ProfileEmail>생년월일: {profile.birthDate}</ProfileEmail> {/* ProfileEmail 스타일 재활용 */}
-          <ProfileDate>가입일: {profile.joinDate}</ProfileDate>
-        </ProfileText>
-      </ProfileInfo>
-      <EditProfileButton>프로필 수정</EditProfileButton>
-    </MyPageProfile>
-
+      <MyPageProfile>
+        <ProfileInfo>
+          <ProfileImage src="/images/kim.PNG" alt="프로필 사진" />
+          <ProfileText>
+            <ProfileName>{profile.name}</ProfileName>
+            <ProfileEmail>이메일: {profile.email}</ProfileEmail>
+            <ProfileEmail>전화번호: {profile.phone}</ProfileEmail>
+            <ProfileEmail>생년월일: {profile.birthDate}</ProfileEmail>
+            <ProfileDate>가입일: {profile.joinDate}</ProfileDate>
+          </ProfileText>
+        </ProfileInfo>
+        <EditProfileButton>프로필 수정</EditProfileButton>
+      </MyPageProfile>
 
       <MyPageStats>
         {willStats.map((stat, idx) => (
@@ -154,18 +161,18 @@ const MyPage = () => {
       </MyPageStats>
 
       <MyPageActions>
-        {["E1", "E2", "E3"].map((icon, idx) => (
-          <ActionButton key={idx}>
-            <img src={`/images/${icon}.PNG`} alt={icon} />
-            <span>
-              {idx === 0
-                ? "새 유언장 작성"
-                : idx === 1
-                ? "열람자 관리"
-                : "보안 설정"}
-            </span>
-          </ActionButton>
-        ))}
+        <ActionButton>
+          <FaFileSignature size={24} />
+          <span>새 유언장 작성</span>
+        </ActionButton>
+        <ActionButton>
+          <FaUserFriends size={24} />
+          <span>열람자 관리</span>
+        </ActionButton>
+        <ActionButton>
+          <FaShieldAlt size={24} />
+          <span>보안 설정</span>
+        </ActionButton>
       </MyPageActions>
 
       <MyPageColumns>
@@ -173,20 +180,18 @@ const MyPage = () => {
           <h4>최근 활동</h4>
           <ul>
             {[
-              "주 유언장 내용 수정",
-              "새로운 열람자 추가: 김미란",
-              "유언장 공증 완료",
-              "2단계 인증 활성화",
-            ].map((text, i) => (
-              <ActivityItem key={i}>
-                <img
-                  src="/images/E7.PNG"
-                  alt="시계 아이콘"
-                  className="icon"
-                />
-                {text}
-                <span className="date">2023.11.{15 - i * 2}</span>
-              </ActivityItem>
+              { text: "주 유언장 내용 수정", date: "2023.11.15" },
+              { text: "새로운 열람자 추가: 김미란", date: "2023.11.13" },
+              { text: "유언장 공증 완료", date: "2023.11.11" },
+              { text: "2단계 인증 활성화", date: "2023.11.09" },
+            ].map((item, i) => (
+              <li key={i}>
+                <ActivityItem>
+                  <FaHistory className="icon" />
+                  {item.text}
+                </ActivityItem>
+                <span className="date">{item.date}</span>
+              </li>
             ))}
           </ul>
         </MyPageRecent>
@@ -195,19 +200,22 @@ const MyPage = () => {
           <Box>
             <h4>보안 설정</h4>
             <SettingsList>
-              {["2단계 인증", "알림 설정", "계정 설정"].map((label, i) => (
-                <SettingsItem key={i}>
-                  <img
-                    src={`/images/E${4 + i}.PNG`}
-                    alt={label}
-                    className="icon"
-                  />
-                  <span>{label}</span>
-                  <img src="/images/E9.PNG" alt="화살표" className="arrow" />
-                </SettingsItem>
+              {[
+                { label: "2단계 인증", icon: <FaUserShield /> },
+                { label: "알림 설정", icon: <FaBell /> },
+                { label: "계정 설정", icon: <FaCog /> },
+              ].map((item, i) => (
+                <li key={i}>
+                  <SettingsItem>
+                    <div className="icon">{item.icon}</div>
+                    <span>{item.label}</span>
+                    <FaAngleRight className="arrow" />
+                  </SettingsItem>
+                </li>
               ))}
             </SettingsList>
           </Box>
+
           <Box>
             <h4>연동 서비스</h4>
             <LinkedServicesText>
@@ -219,7 +227,7 @@ const MyPage = () => {
           </Box>
 
           <LogoutButton>
-            <img src="/images/E8.PNG" alt="로그아웃" className="icon" />
+            <FaSignOutAlt className="icon" />
             로그아웃
           </LogoutButton>
         </MyPageSide>

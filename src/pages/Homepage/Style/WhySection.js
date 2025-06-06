@@ -1,8 +1,8 @@
-// components/styles/WhySectionStyles.js
+// 왜 마침표인가?
 import styled from 'styled-components';
 
 export const WhySection = styled.section`
-  background-color: #f5f7ff;
+  background-color: #ffffff;
   padding: 100px 20px;
   text-align: center;
 `;
@@ -10,9 +10,9 @@ export const WhySection = styled.section`
 export const FeatureGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1200px;
-  margin: 48px auto 0;
+  gap: 16px; /* 카드 간 간격을 여유롭게 */
+  max-width: 960px;
+  margin: 40px auto 0;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -24,28 +24,34 @@ export const FeatureGrid = styled.div`
 `;
 
 export const FeatureCard = styled.div`
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  background: #f9fafb; /* 은은한 연회색 배경 */
+  border-radius: 12px;
+  padding:8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   text-align: left;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  }
 
   h4 {
     font-size: 16px;
     font-weight: 700;
-    margin-bottom: 12px;
-    color: #111827;
+    margin-bottom: 8px;
+    color: #1f2937;
   }
 
   p {
-    font-size: 14px;
+    font-size: 13px;
     color: #6b7280;
     line-height: 1.5;
   }
 `;
 
 export const FeatureIcon = styled.img`
-  width: 32px;
-  height: 32px;
-  margin-bottom: 12px;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 10px;
 `;

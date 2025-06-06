@@ -1,9 +1,9 @@
-// components/styles/StepTimelineStyles.js
+// 서비스 작동 원리
 import styled from 'styled-components';
 
 export const StepContainer = styled.section`
-  background: white;
-  padding: 100px 20px;
+  background: #ffffff;
+  padding: 70px 20px;
   text-align: center;
 `;
 
@@ -40,15 +40,18 @@ export const StepTimeline = styled.div`
 export const StepItem = styled.div`
   background: white;
   z-index: 1;
-  text-align: center;
   flex: 1;
   max-width: 180px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 `;
 
 export const IconCircle = styled.div`
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   background: #eef2ff;
   color: #6366f1;
   border-radius: 50%;
@@ -63,18 +66,20 @@ export const IconCircle = styled.div`
 export const StepLabel = styled.div`
   font-weight: 700;
   font-size: 15px;
-  margin-bottom: 8px;
+  margin: 4px 0 8px;
 `;
 
 export const StepText = styled.p`
   font-size: 13px;
   color: #6b7280;
   line-height: 1.5;
+  margin: 0;
 `;
 
 export const Connector = styled.span`
   position: absolute;
-  top: 56px;
+  top: 50%;
+  transform: translateY(-50%);
   right: -16px;
   color: #ccc;
   font-size: 20px;
