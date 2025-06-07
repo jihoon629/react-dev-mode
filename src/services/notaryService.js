@@ -1,6 +1,6 @@
 // application/client-react/src/services/notaryService.js
 import axios from 'axios';
-axios.defaults.baseURL = "http://localhost:8001"; 
+axios.defaults.baseURL = "http://172.30.113.58:8001"; 
 axios.defaults.withCredentials = true; 
 
 const upsertOwnNotaryDetails = async (detailsData, username) => { // username 파라미터 추가
